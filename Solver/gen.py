@@ -24,13 +24,14 @@ class SatSolver():
         self.board = board
         self.vars = VarsGenerator(board)
         self.generate_bi_dict()
-
-        print(self.bidict)
+        
+        
         self.clauses = 0
         self.constraints = ''
 
     def generate_bi_dict(self):
         vars_set =self.vars.generate_variables()
+        
         glucose_vars = range(1, len(vars_set)+1)
         vars_dict = {var:str(glucose_var) for var, glucose_var in zip(vars_set, glucose_vars)}
         self.bidict = bidict(vars_dict)
@@ -41,20 +42,31 @@ class SatSolver():
 
     ##############
 
+    def exactly_one_value_in_cell(self):
+        for row, col in self.vars.white_cells:
+            
+            vars = self.vars.generate_values_per_cell(row, col)
+            self.increase_outputs(sum_greater_or_equal(self.bidict, vars, 1))
+            self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
+
+
+
+
     def call_glucose(self):
         subprocess.run(['./glucose', CNF_FILE_NAME, GLUCOSE_FILE_NAME,  '-model', '-verb=0'], 
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def parse_output(self):
         if not self.output: return None
+        vars = self.output.split()
+        vars = list(filter(lambda x: int(x) > 0, vars))
+        output = [self.bidict.inverse[var] for var in vars]
+        print(output)
        
         
     def solve(self):
-        self.each_team_plays_with_another_exactly_one_time()
-        self.at_most_one_game_a_day_per_team()
-        self.only_one_game_per_day_and_slot()
-        self.no_two_consecutive_local_games_per_team()
-        self.no_two_consecutive_away_games_per_team()
+
+        self.exactly_one_value_in_cell()
         self.constraints = f'p cnf {len(self.bidict)} {self.clauses}\n{self.constraints}'
 
         with open(CNF_FILE_NAME, 'w') as f:
