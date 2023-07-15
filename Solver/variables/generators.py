@@ -54,12 +54,21 @@ class VarsGenerator():
                 
             else:                
                 adjacent_cells_rows.append([cell])
-
-
-        adjacent_cells_rows.pop()
-
-        print(adjacent_cells_rows)
-
+        self.adjacent_cells_rows = adjacent_cells_rows
+        # Obtener las columnas de celdas adjacentes
+        adjacent_cells_cols = [[]]
+        for col in range(0, self.total_rows):
+            for row in range(0, self.total_cols):
+                cell = self.board.get_cell(row, col)
+                if cell != []:
+                    continue
+                cell = (row+1, col+1)
+                last_added_col = adjacent_cells_cols[-1]
+                if len(last_added_col) == 0 or last_added_col[-1] == (cell[0]-1, cell[1]):
+                    last_added_col.append(cell)
+                else:
+                    adjacent_cells_cols.append([cell])
+        self.adjacent_cells_cols = adjacent_cells_cols
 
         return vars
 
