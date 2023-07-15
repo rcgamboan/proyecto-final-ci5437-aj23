@@ -22,15 +22,16 @@ GLUCOSE_FILE_NAME = 'gluc.gluc'
 class SatSolver():
     def __init__(self, board):
         self.board = board
-        self.vars = VarsGenerator(board)
+        self.total_values = 9
+        self.vars = VarsGenerator(board, self.total_values)
         self.generate_bi_dict()
         
-        
+
         self.clauses = 0
         self.constraints = ''
 
     def generate_bi_dict(self):
-        vars_set =self.vars.generate_variables()
+        vars_set = self.vars.generate_variables()
         
         glucose_vars = range(1, len(vars_set)+1)
         vars_dict = {var:str(glucose_var) for var, glucose_var in zip(vars_set, glucose_vars)}
@@ -43,11 +44,30 @@ class SatSolver():
     ##############
 
     def exactly_one_value_in_cell(self):
+        'Una celda solo puede contener un valor'
         for row, col in self.vars.white_cells:
             
             vars = self.vars.generate_values_per_cell(row, col)
             self.increase_outputs(sum_greater_or_equal(self.bidict, vars, 1))
             self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
+
+    def unique_values_in_sums(self):
+        'No se pueden repetir valores por fila de celdas adjacentes'
+        for row in self.vars.adjacent_cells_rows:
+            for value in range(1, self.total_values+1):
+                vars = self.vars.generate_adjacent_cells_per_value(row, value)
+                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
+
+        for col in self.vars.adjacent_cells_cols:
+            for value in range(1, self.total_values+1):
+                vars = self.vars.generate_adjacent_cells_per_value(col, value)
+                print(vars)
+                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))         
+
+
+            
+        
+
 
 
 
@@ -67,6 +87,7 @@ class SatSolver():
     def solve(self):
 
         self.exactly_one_value_in_cell()
+        self.unique_values_in_sums()
         self.constraints = f'p cnf {len(self.bidict)} {self.clauses}\n{self.constraints}'
 
         with open(CNF_FILE_NAME, 'w') as f:
