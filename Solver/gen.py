@@ -20,15 +20,12 @@ CNF_FILE_NAME = 'cnf.cnf'
 GLUCOSE_FILE_NAME = 'gluc.gluc'
 
 class SatSolver():
-    def __init__(self, total_teams, 
-                total_days, slots_per_day,teams=None):
-        self.total_teams = total_teams
-        self.total_days = total_days
-        self.slots_per_day = slots_per_day
-        self.vars = VarsGenerator(self.total_teams, self.total_days, self.slots_per_day)
+    def __init__(self, board):
+        self.board = board
+        self.vars = VarsGenerator(board)
         self.generate_bi_dict()
-        self.teams = teams
-        
+
+        print(self.bidict)
         self.clauses = 0
         self.constraints = ''
 
@@ -42,49 +39,6 @@ class SatSolver():
         self.constraints += args[0]
         self.clauses += args[1]
 
-    # Restricciones
-    def each_team_plays_with_another_exactly_one_time(self):
-        'Cada equipo debe jugar contra otro exactamente una vez'
-        for local_team in range(1, self.total_teams+1):
-            for road_team in range(1, self.total_teams+1):
-                if local_team == road_team: continue
-                vars = self.vars.generate_days_with_teams(local_team, road_team)
-
-                self.increase_outputs(sum_greater_or_equal(self.bidict, vars, 1))                
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
-                
-
-    def at_most_one_game_a_day_per_team(self):
-        'A lo mas un equipo puede jugar una vez por dia'
-        for team in range(1, self.total_teams+1):
-            for day in range(1, self.total_days+1):
-                vars = self.vars.generate_days_per_team(team, day)                
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
-
-    def only_one_game_per_day_and_slot(self):
-        'No puede haber dos juegos al mismo tiempo'
-        for day in range(1, self.total_days+1):
-            for slot in range(1, self.slots_per_day+1):
-                vars = self.vars.generate_teams_per_day_and_slot(day, slot)
-
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
-
-    def no_two_consecutive_local_games_per_team(self):
-        'Un equipo no puede jugar como local dos dias seguidos'        
-        for team in range(1, self.total_teams+1):           
-            for day in range(1, self.total_days):                
-                vars = self.vars.generate_no_consecutive_local_games(team, day)
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
-
-    def no_two_consecutive_away_games_per_team(self):
-        'Un equipo no puede jugar como visitante dos dias seguidos'        
-        for team in range(1, self.total_teams+1):           
-            for day in range(1, self.total_days):                
-                vars = self.vars.generate_no_consecutive_away_games(team, day)
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
-
-
-
     ##############
 
     def call_glucose(self):
@@ -93,12 +47,7 @@ class SatSolver():
 
     def parse_output(self):
         if not self.output: return None
-        vars = self.output.split()
-        vars = list(filter(lambda x: int(x) > 0, vars))
-        output = [self.bidict.inverse[var] for var in vars]
-        parser = Parser(output, self.total_teams, self.total_days, self.slots_per_day, self.teams)
-        self.output = parser.parse_vars()
-        
+       
         
     def solve(self):
         self.each_team_plays_with_another_exactly_one_time()
