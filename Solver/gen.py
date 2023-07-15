@@ -19,33 +19,6 @@ GLUCOSE_PATH = './'
 CNF_FILE_NAME = 'cnf.cnf'
 GLUCOSE_FILE_NAME = 'gluc.gluc'
 
-class Board(object):
-    def __init__(self,string,row,col) -> None:
-        self.row = row
-        self.col = col
-        self.board = get_board(string,row,col)
-
-def get_board(s, rows, cols):
-    """Parse a string representation of a board into a grid of Cells"""
-    board = []
-    lines = [l for l in s.split('\n') if l != ''] # Remove empty lines
-    re_cells = re.compile('\s+')
-    if len(lines) != rows:
-        raise Exception("Wrong number of rows: %r" % lines)
-    for i, l in enumerate(lines):
-        row = []
-        cells = [l for l in re_cells.split(l) if l != '']
-        if len(cells) != cols:
-            raise Exception("Row is wrong length: %r" % cells)
-        for j, c in enumerate(cells):
-            row.append(Cell(c, row=i, col=j))
-        board.append(row)
-    return board
-
-def dump(board, model=None):
-    for l in board:
-        print("".join([x.display(model) for x in l]))
-
 class SatSolver():
     def __init__(self, total_teams, 
                 total_days, slots_per_day,teams=None):
