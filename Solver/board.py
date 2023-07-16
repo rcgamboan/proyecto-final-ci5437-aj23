@@ -44,7 +44,8 @@ class Board(object):
         return self.board[row][col]
 
     def set_solution(self, solution):
-        pass
+        for cell in solution:
+            self.board[cell.row-1][cell.col-1] = [cell.value]
     
     def generate_board_img(self):
 
@@ -52,8 +53,8 @@ class Board(object):
         cell_size = 100
 
         # Calculate the board size
-        width = len(self.col) * cell_size
-        height = len(self.row) * cell_size
+        width = self.col * cell_size
+        height = self.row * cell_size
 
         # Create a blank image
         image = Image.new("RGB", (width, height), "white")
@@ -65,7 +66,7 @@ class Board(object):
         split_font = ImageFont.truetype("arial.ttf", cell_size // 3)
 
         # Draw the Kakuro board
-        for i in range(len(self.row)):
+        for i in range(self.row):
             for j in range(self.col):
                 # Calculate the cell position
                 x = j * cell_size
@@ -79,10 +80,13 @@ class Board(object):
                 elif len(cell) == 2:
                     split_cell = True
                     cell_value = cell[0] + cell[1]
+                else:
+                    cell_value = cell[0]
+                
 
             
                 # Draw the cell
-                if len(cell) > 0:
+                if len(cell) > 1:
                     draw.rectangle([(x, y), (x + cell_size, y + cell_size)], fill="gray", outline="black")
                 else:
                     draw.rectangle([(x, y), (x + cell_size, y + cell_size)], fill="white", outline="black")

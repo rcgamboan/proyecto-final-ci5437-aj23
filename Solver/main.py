@@ -1,6 +1,5 @@
 from gen import *
 from board import *
-from generate_img import *
 import sys
 
 if __name__ == '__main__':
@@ -18,7 +17,9 @@ if __name__ == '__main__':
     # valor a cada celda
     tablero.print_board()
     cells = solver.solve()
+    
     tablero.set_solution(cells)
     tablero.generate_board_img()
-    print(cells.__dir__())
+    
+    print("Se ha generado la imagen kakuro_board.png con la solucion del problema!")
     print(cells)
