@@ -128,6 +128,32 @@ class SatSolver():
             constraint = " ".join(partition_variables)
             constraint += " 0\n"
             self.increase_outputs((constraint, 1))
+
+    def col_partitions_add(self):
+        col_contain_value = "cc"
+        for col in self.vars.adjacent_cells_cols:
+            # Obtener la suma objetivo de la fila
+            objective_value = self.board.get_cell(col[0][0]-2, col[0][1]-1)[0]
+            partitions = generate_partitions(objective_value, len(col), 9)
+
+            partition_variables = []
+            for partition in partitions:
+                var = self.bidict[self.vars.format_var(col[0][0], col[0][1]-1, 0, str(partition))]
+                constraint = f"{var}"
+                partition_variables.append(f"{var}")
+                for value in partition:
+                    constraint += f" -{self.bidict[self.vars.format_var(col[0][0], col[0][1], value, col_contain_value)]}"
+                constraint += " 0\n"
+                self.increase_outputs((constraint, 1))
+                
+                for value in partition:
+                    constraint = f"-{var}"
+                    constraint += f" {self.bidict[self.vars.format_var(col[0][0], col[0][1], value, col_contain_value)]} 0\n"
+                    self.increase_outputs((constraint, 1))
+            
+            constraint = " ".join(partition_variables)
+            constraint += " 0\n"
+            self.increase_outputs((constraint, 1))
             
 
                 
@@ -156,6 +182,7 @@ class SatSolver():
         self.row_contains_value()
         self.col_contains_value()
         self.row_partitions_add()
+        self.col_partitions_add()
         self.constraints = f'p cnf {len(self.bidict)} {self.clauses}\n{self.constraints}'
 
         with open(CNF_FILE_NAME, 'w') as f:
