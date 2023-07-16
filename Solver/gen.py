@@ -22,7 +22,7 @@ GLUCOSE_FILE_NAME = 'gluc.gluc'
 class SatSolver():
     def __init__(self, board):
         self.board = board
-        self.total_values = 9
+        self.total_values = 2
         self.vars = VarsGenerator(board, self.total_values)
         self.generate_bi_dict()
         
@@ -62,7 +62,50 @@ class SatSolver():
         for col in self.vars.adjacent_cells_cols:
             for value in range(1, self.total_values+1):
                 vars = self.vars.generate_adjacent_cells_per_value(col, value)                
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1)) 
+                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
+
+    def row_contains_value(self):
+        row_contain_value = "fc"
+        for row in self.vars.adjacent_cells_rows:
+            for value in range(1, self.total_values+1):
+                cont = self.vars.format_var(row[0][0], row[0][1], value, row_contain_value)
+                
+                for cell in row:
+                    constraint = f"{cont} -" + self.vars.format_var(cell[0], cell[1], value)
+                    constraint += "\n"
+                    self.increase_outputs((constraint, 1))
+
+
+                cont =f"-{cont}"
+                for cell in row:
+                    cont += " " + self.vars.format_var(cell[0], cell[1], value)
+                cont += "\n"
+                self.increase_outputs((cont, 1))
+
+
+    def col_contains_value(self):
+        col_contain_value = "cc"
+        for col in self.vars.adjacent_cells_cols:
+            for value in range(1, self.total_values+1):
+                cont = self.vars.format_var(col[0][0], col[0][1], value, col_contain_value)
+                
+                for cell in col:
+                    constraint = f"{cont} -" + self.vars.format_var(cell[0], cell[1], value)
+                    constraint += "\n"
+                    self.increase_outputs((constraint, 1))
+
+
+                cont =f"-{cont}"
+                for cell in col:
+                    cont += " " + self.vars.format_var(cell[0], cell[1], value)
+                cont += "\n"
+                self.increase_outputs((cont, 1))
+        print(self.constraints)
+        
+
+
+                
+
 
 
            
@@ -91,6 +134,8 @@ class SatSolver():
 
         self.exactly_one_value_in_cell()
         self.unique_values_in_sums()
+        self.row_contains_value()
+        self.col_contains_value()
         self.constraints = f'p cnf {len(self.bidict)} {self.clauses}\n{self.constraints}'
 
         with open(CNF_FILE_NAME, 'w') as f:
