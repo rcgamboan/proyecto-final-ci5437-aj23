@@ -1,19 +1,30 @@
+def partition_min_max(n,k,l,m):
+    'Consigue las k particiones posibles de un numero n'
+    if k < 1:
+        return
+    if k == 1:
+        if n <= m and n>=l :
+            yield (n,)
+        return
+    if (k*128) < n: #If the current sum is too small to reach n
+        return
+    if k*1 > n:#If current sum is too big to reach n
+        return
+    for i in range(l,m+1):
+        for result in partition_min_max(n-i,k-1,i,m):                
+            yield result+(i,)
 
-from itertools import combinations
+def has_duplicates(list):
+    prev_len = len(list)
+    a_set = set(list)
+    return prev_len != len(a_set)
 
-def filter_max_value(comb, max_value):
-    for value in comb:
-        if value > max_value:
-            return False
-    return True
+def generate_partitions(n,k,m,l=1):
 
-def generate_partitions(n, k, max_value):
-    
-    combs = combinations(range(1, n+1), k)
-    valid_combs = filter(lambda x: sum(x) == n, combs)
-    valid_combs = filter(lambda x: filter_max_value(x, max_value), valid_combs)
+    y = [x for x in partition_min_max(n, k, l, m)]
+    z = list(filter(lambda x: not has_duplicates(x), y))
+    return z
 
-    return list(valid_combs)
 
 class VarsGenerator():
     def __init__(self, board, values):
