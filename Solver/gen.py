@@ -22,21 +22,22 @@ GLUCOSE_FILE_NAME = 'gluc.gluc'
 class SatSolver():
     def __init__(self, board):
         self.board = board
-        self.total_values = 2
+        self.total_values = 9
         self.vars = VarsGenerator(board, self.total_values)
         self.generate_bi_dict()
         
 
         self.clauses = 0
         self.constraints = ''
+        
 
     def generate_bi_dict(self):
         vars_set = self.vars.generate_variables()
         
         glucose_vars = range(1, len(vars_set)+1)
         vars_dict = {var:str(glucose_var) for var, glucose_var in zip(vars_set, glucose_vars)}
-
         self.bidict = bidict(vars_dict)
+        print(self.bidict)
 
     def increase_outputs(self, args):        
         self.constraints += args[0]
@@ -68,18 +69,18 @@ class SatSolver():
         row_contain_value = "fc"
         for row in self.vars.adjacent_cells_rows:
             for value in range(1, self.total_values+1):
-                cont = self.vars.format_var(row[0][0], row[0][1], value, row_contain_value)
+                cont = self.bidict[self.vars.format_var(row[0][0], row[0][1], value, row_contain_value)]
                 
                 for cell in row:
-                    constraint = f"{cont} -" + self.vars.format_var(cell[0], cell[1], value)
-                    constraint += "\n"
+                    constraint = f"{cont} -" + self.bidict[self.vars.format_var(cell[0], cell[1], value)]
+                    constraint += " 0\n"
                     self.increase_outputs((constraint, 1))
 
 
                 cont =f"-{cont}"
                 for cell in row:
-                    cont += " " + self.vars.format_var(cell[0], cell[1], value)
-                cont += "\n"
+                    cont += " " + self.bidict[self.vars.format_var(cell[0], cell[1], value)]
+                cont += " 0\n"
                 self.increase_outputs((cont, 1))
 
 
@@ -135,6 +136,7 @@ class SatSolver():
             if self.output == "UNSAT":
                 self.output = None
         self.parse_output()
+        print(self.output)
         return self.output
             
 

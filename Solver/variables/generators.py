@@ -125,8 +125,6 @@ class VarsGenerator():
                 vars.append(
                         self.format_var(col[0][0], col[0][1]-1, 0, str(partition))
                     )
-        
-         
 
         return vars
 
