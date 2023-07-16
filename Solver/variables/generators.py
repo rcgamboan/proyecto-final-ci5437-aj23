@@ -1,4 +1,20 @@
 
+from itertools import combinations
+
+def filter_max_value(comb, max_value):
+    for value in comb:
+        if value > max_value:
+            return False
+    return True
+
+def generate_partitions(n, k, max_value):
+    
+    combs = combinations(range(1, n+1), k)
+    valid_combs = filter(lambda x: sum(x) == n, combs)
+    valid_combs = filter(lambda x: filter_max_value(x, max_value), valid_combs)
+
+    return list(valid_combs)
+    
 class VarsGenerator():
     def __init__(self, board, values):
         self.total_rows = board.row

@@ -100,22 +100,6 @@ class SatSolver():
                     cont += " " + self.vars.format_var(cell[0], cell[1], value)
                 cont += "\n"
                 self.increase_outputs((cont, 1))
-        print(self.constraints)
-        
-
-
-                
-
-
-
-           
-
-
-            
-        
-
-
-
 
 
     def call_glucose(self):

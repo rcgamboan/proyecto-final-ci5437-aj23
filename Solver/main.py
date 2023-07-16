@@ -14,3 +14,9 @@ if __name__ == '__main__':
     solver = SatSolver(tablero)
     solver.solve()
 
+
+
+
+
+
+print(generate_partitions(20, 4, 9))
