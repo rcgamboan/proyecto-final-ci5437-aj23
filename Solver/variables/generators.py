@@ -14,7 +14,7 @@ def generate_partitions(n, k, max_value):
     valid_combs = filter(lambda x: filter_max_value(x, max_value), valid_combs)
 
     return list(valid_combs)
-    
+
 class VarsGenerator():
     def __init__(self, board, values):
         self.total_rows = board.row
@@ -104,6 +104,30 @@ class VarsGenerator():
                     self.format_var(row, col, value, "cc")
                 )
         
+        # Variables auxiliares para la suma
+        # Combinaciones de particiones de k numeros que suman un numero n
+        for row in adjacent_cells_rows:
+            # Obtener la suma objetivo de la fila
+            objective_value = self.board.get_cell(row[0][0]-1, row[0][1]-2)[1]
+            partitions = generate_partitions(objective_value, len(row), 9)
+        
+            for partition in partitions:
+                vars.append(
+                        self.format_var(row[0][0], row[0][1]-1, 0, str(partition))
+                    )
+        
+        for col in adjacent_cells_cols:
+            # Obtener la suma objetivo de la fila
+            objective_value = self.board.get_cell(col[0][0]-2, col[0][1]-1)[0]
+            partitions = generate_partitions(objective_value, len(col), 9)
+            
+            for partition in partitions:
+                vars.append(
+                        self.format_var(col[0][0], col[0][1]-1, 0, str(partition))
+                    )
+        
+         
+
         return vars
 
     def generate_values_per_cell(self, row, col):
