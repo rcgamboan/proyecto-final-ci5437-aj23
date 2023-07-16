@@ -1,5 +1,6 @@
 from variables.generators import (
-    VarsGenerator
+    VarsGenerator,
+    generate_partitions
 )
 
 from variables.Parser import (
@@ -102,6 +103,39 @@ class SatSolver():
                 cont += " 0\n"
                 self.increase_outputs((cont, 1))
 
+    def row_partitions_add(self):
+        row_contain_value = "fc"
+        for row in self.vars.adjacent_cells_rows:
+            # Obtener la suma objetivo de la fila
+            objective_value = self.board.get_cell(row[0][0]-1, row[0][1]-2)[1]
+            partitions = generate_partitions(objective_value, len(row), 9)
+
+            partition_variables = []
+            for partition in partitions:
+                var = self.bidict[self.vars.format_var(row[0][0], row[0][1]-1, 0, str(partition))]
+                constraint = f"{var}"
+                partition_variables.append(f"{var}")
+                for value in partition:
+                    constraint += f" -{self.bidict[self.vars.format_var(row[0][0], row[0][1], value, row_contain_value)]}"
+                constraint += " 0\n"
+                self.increase_outputs((constraint, 1))
+                
+                for value in partition:
+                    constraint = f"-{var}"
+                    constraint += f" {self.bidict[self.vars.format_var(row[0][0], row[0][1], value, row_contain_value)]} 0\n"
+                    self.increase_outputs((constraint, 1))
+            
+            constraint = " ".join(partition_variables)
+            constraint += " 0\n"
+            self.increase_outputs((constraint, 1))
+            
+
+                
+
+                
+
+
+
 
     def call_glucose(self):
         subprocess.run(['./glucose', CNF_FILE_NAME, GLUCOSE_FILE_NAME,  '-model', '-verb=0'], 
@@ -112,7 +146,7 @@ class SatSolver():
         vars = self.output.split()
         vars = list(filter(lambda x: int(x) > 0, vars))
         output = [self.bidict.inverse[var] for var in vars]
-        print(output)
+        self.output = output
        
         
     def solve(self):
@@ -121,6 +155,7 @@ class SatSolver():
         self.unique_values_in_sums()
         self.row_contains_value()
         self.col_contains_value()
+        self.row_partitions_add()
         self.constraints = f'p cnf {len(self.bidict)} {self.clauses}\n{self.constraints}'
 
         with open(CNF_FILE_NAME, 'w') as f:
