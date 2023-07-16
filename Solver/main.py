@@ -12,5 +12,8 @@ if __name__ == '__main__':
     # al crear el objeto se leera del archivo y se agregaran los datos a la matriz correspondiente
     tablero = Board(sys.argv[1])
     solver = SatSolver(tablero)
-    solver.solve()
 
+    # La solucion retornar una lista de la clase cells con la asignacion de cada
+    # valor a cada celda
+    cells = solver.solve()
+    print(cells)

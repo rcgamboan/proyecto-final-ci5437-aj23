@@ -38,7 +38,7 @@ class SatSolver():
         glucose_vars = range(1, len(vars_set)+1)
         vars_dict = {var:str(glucose_var) for var, glucose_var in zip(vars_set, glucose_vars)}
         self.bidict = bidict(vars_dict)
-        print(self.bidict)
+        
 
     def increase_outputs(self, args):        
         self.constraints += args[0]
@@ -67,6 +67,7 @@ class SatSolver():
                 self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))
 
     def row_contains_value(self):
+        'Variables que indican si una fila contiene un valor'
         row_contain_value = "fc"
         for row in self.vars.adjacent_cells_rows:
             for value in range(1, self.total_values+1):
@@ -86,6 +87,7 @@ class SatSolver():
 
 
     def col_contains_value(self):
+        'Variables que indican si una columna contiene un valor'
         col_contain_value = "cc"
         for col in self.vars.adjacent_cells_cols:
             for value in range(1, self.total_values+1):
@@ -104,9 +106,9 @@ class SatSolver():
                 self.increase_outputs((cont, 1))
 
     def row_partitions_add(self):
+        'Calcula las posibles particiones que pueden resolver una fila'
         row_contain_value = "fc"
-        for row in self.vars.adjacent_cells_rows:
-            # Obtener la suma objetivo de la fila
+        for row in self.vars.adjacent_cells_rows:            
             objective_value = self.board.get_cell(row[0][0]-1, row[0][1]-2)[1]
             partitions = generate_partitions(objective_value, len(row), 9)
 
@@ -130,9 +132,9 @@ class SatSolver():
             self.increase_outputs((constraint, 1))
 
     def col_partitions_add(self):
+        'Calcula las posibles particiones que pueden resolver una columna'
         col_contain_value = "cc"
-        for col in self.vars.adjacent_cells_cols:
-            # Obtener la suma objetivo de la fila
+        for col in self.vars.adjacent_cells_cols:            
             objective_value = self.board.get_cell(col[0][0]-2, col[0][1]-1)[0]
             partitions = generate_partitions(objective_value, len(col), 9)
 
@@ -156,13 +158,6 @@ class SatSolver():
             self.increase_outputs((constraint, 1))
             
 
-                
-
-                
-
-
-
-
     def call_glucose(self):
         subprocess.run(['./glucose', CNF_FILE_NAME, GLUCOSE_FILE_NAME,  '-model', '-verb=0'], 
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -172,7 +167,10 @@ class SatSolver():
         vars = self.output.split()
         vars = list(filter(lambda x: int(x) > 0, vars))
         output = [self.bidict.inverse[var] for var in vars]
-        self.output = output
+        self.parser = Parser(output, self.board.row, self.board.col, self.total_values)
+        output = self.parser.parse_vars()
+        self.output = output       
+        
        
         
     def solve(self):
@@ -198,7 +196,7 @@ class SatSolver():
             if self.output == "UNSAT":
                 self.output = None
         self.parse_output()
-        print(self.output)
+        
         return self.output
             
 

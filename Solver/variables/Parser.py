@@ -1,39 +1,37 @@
 class Parser():
-    def __init__(self, vars, total_teams, total_days, slots_per_day,teams=None):
+    def __init__(self, vars, rows, cols, values):
         self.vars = vars
-        self.total_teams = total_teams
-        self.total_days = total_days
-        self.slots_per_day = slots_per_day
-        self.len_total_teams = len(str(total_teams))
-        self.len_total_days = len(str(total_days))
-        self.len_slots_per_day = len(str(slots_per_day))
-        self.teams = teams
+        self.rows = rows
+        self.cols = cols
+        self.values = values 
+        
+        self.len_rows = len(str(rows))
+        self.len_cols = len(str(cols))
+        self.values = len(str(values))
+        
 
     def parse_vars(self):
         output = []
         for var in self.vars:
-            local = var[:self.len_total_teams]
-            away = var[self.len_total_teams:2*self.len_total_teams]
-            day = var[2*self.len_total_teams:2*self.len_total_teams+self.len_total_days]
-            slot = var[-self.len_slots_per_day:]
+            try:
+                value = int(var[self.len_rows+self.len_cols:])
+            except ValueError:
+                continue
+            row = var[:self.len_rows]
+            col = var[self.len_rows:self.len_rows+self.len_cols]
+            
+
             output.append(
-                Asignation(local, away, day, slot,self.teams)
+                Cell(row, col, value)
             )
         return output
 
-class Asignation():
-    def __init__(self, local, away, day, slot, teams=None):
-        self.local = int(local)
-        self.away = int(away)
-        self.day = int(day)
-        self.slot = int(slot)
-        self.teams = teams
-        
+class Cell():
+    def __init__(self, row, col, value):
+        self.row = int(row)
+        self.col = int(col)
+        self.value = int(value)
+
     def __repr__(self) -> str:
-        #print("\nequipos:")
-        #print(self.teams)
-        if self.teams == None:
-            return f'{self.local} vs {self.away} {self.day}-{self.slot}'
-        else:
-            return f'{self.teams[self.local-1]} vs {self.teams[self.away-1]} {self.day}-{self.slot}'
+        return f"{(self.row,self.col)} : {self.value}"
         
