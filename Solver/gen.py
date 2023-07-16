@@ -88,18 +88,18 @@ class SatSolver():
         col_contain_value = "cc"
         for col in self.vars.adjacent_cells_cols:
             for value in range(1, self.total_values+1):
-                cont = self.vars.format_var(col[0][0], col[0][1], value, col_contain_value)
+                cont = self.bidict[self.vars.format_var(col[0][0], col[0][1], value, col_contain_value)]
                 
                 for cell in col:
-                    constraint = f"{cont} -" + self.vars.format_var(cell[0], cell[1], value)
-                    constraint += "\n"
+                    constraint = f"{cont} -" + self.bidict[self.vars.format_var(cell[0], cell[1], value)]
+                    constraint += " 0\n"
                     self.increase_outputs((constraint, 1))
 
 
                 cont =f"-{cont}"
                 for cell in col:
-                    cont += " " + self.vars.format_var(cell[0], cell[1], value)
-                cont += "\n"
+                    cont += " " + self.bidict[self.vars.format_var(cell[0], cell[1], value)]
+                cont += " 0\n"
                 self.increase_outputs((cont, 1))
 
 
