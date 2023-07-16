@@ -18,12 +18,13 @@ class VarsGenerator():
     def format_col(self, day):
         return self.format(day, self.len_total_cols)
 
-    def format_var(self, row, col, value):
+    def format_var(self, row, col, value, auxiliar=''):
         assert len(str(row)) <= self.total_rows
         assert len(str(col)) <= self.total_cols
         return ''.join([
             self.format_row(row),
             self.format_col(col),
+            auxiliar,
             str(value)
         ])
 
@@ -56,6 +57,7 @@ class VarsGenerator():
             else:                
                 adjacent_cells_rows.append([cell])
         self.adjacent_cells_rows = adjacent_cells_rows
+
         # Obtener las columnas de celdas adjacentes
         adjacent_cells_cols = [[]]
         for col in range(0, self.total_rows):
@@ -71,6 +73,21 @@ class VarsGenerator():
                     adjacent_cells_cols.append([cell])
         self.adjacent_cells_cols = adjacent_cells_cols
 
+        # Variables auxiliares. Columnas/Filas contiene al valor value
+        for row in adjacent_cells_rows:
+            (row, col) = row[0]
+            for value in range(1, self.total_values+1):
+                vars.append(
+                    self.format_var(row, col, value, "fc")
+                )
+
+        for col in adjacent_cells_cols:
+            (row, col) = col[0]
+            for value in range(1, self.total_values+1):
+                vars.append(
+                    self.format_var(row, col, value, "cc")
+                )
+        
         return vars
 
     def generate_values_per_cell(self, row, col):

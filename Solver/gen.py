@@ -35,6 +35,7 @@ class SatSolver():
         
         glucose_vars = range(1, len(vars_set)+1)
         vars_dict = {var:str(glucose_var) for var, glucose_var in zip(vars_set, glucose_vars)}
+
         self.bidict = bidict(vars_dict)
 
     def increase_outputs(self, args):        
@@ -60,9 +61,11 @@ class SatSolver():
 
         for col in self.vars.adjacent_cells_cols:
             for value in range(1, self.total_values+1):
-                vars = self.vars.generate_adjacent_cells_per_value(col, value)
-                print(vars)
-                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1))         
+                vars = self.vars.generate_adjacent_cells_per_value(col, value)                
+                self.increase_outputs(sum_less_or_equal(self.bidict, vars, 1)) 
+
+
+           
 
 
             
