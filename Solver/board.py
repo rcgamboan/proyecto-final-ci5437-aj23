@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-
+import os
 class Board(object):
 
     # se crea un objeto Board con el archivo suministrado
@@ -15,6 +15,7 @@ class Board(object):
         self.row = 0
         self.col = 0
         self.board = []
+        self.title = os.path.splitext(file)[0]
         self.get_board(file)
     
     def add_row(self, row):
@@ -119,7 +120,8 @@ class Board(object):
 
 
         # Save the image
-        image.save("kakuro_board.png")
+        image.save(self.title+".png")
+        print(f'Se ha generado la imagen {self.title+".png"} con la solucion del problema!')
 
 
     def get_board(self,file):
