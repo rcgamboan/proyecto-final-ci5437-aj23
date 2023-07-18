@@ -16,9 +16,9 @@ if __name__ == '__main__':
     # La solucion retornar una lista de la clase cells con la asignacion de cada
     # valor a cada celda
     #tablero.print_board()
-    #cells = solver.solve()
+    cells = solver.solve()
     
-    #tablero.set_solution(cells)
+    tablero.set_solution(cells)
     tablero.generate_board_img()
     
     
