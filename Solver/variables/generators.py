@@ -63,6 +63,7 @@ class VarsGenerator():
         # Obtener las celdas donde deben ir los valores
         for row in range(0, self.total_rows):
             for col in range(0, self.total_cols):
+
                 cell = self.board.get_cell(row, col)
                 if cell != []:
                     continue

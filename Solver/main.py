@@ -15,11 +15,13 @@ if __name__ == '__main__':
 
     # La solucion retornar una lista de la clase cells con la asignacion de cada
     # valor a cada celda
-    #tablero.print_board()
+
     cells = solver.solve()
     
+    if cells == None:
+        print("Este kakuro es irresoluble!")
+        sys.exit()
+        
     tablero.set_solution(cells)
     tablero.generate_board_img()
     
-    
-    #print(cells)

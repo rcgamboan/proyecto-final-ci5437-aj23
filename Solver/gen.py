@@ -187,10 +187,8 @@ class SatSolver():
             f.write(self.constraints)
             f.close()
 
-        print("Solving!")
-
         self.call_glucose()
-        print("Parsing solution!")
+
         with open(GLUCOSE_FILE_NAME, 'r') as f:
             self.output = f.readline().strip()
             if self.output == "UNSAT":
